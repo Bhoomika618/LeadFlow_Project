@@ -22,7 +22,7 @@ export default function AdminDashboard() {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/api/admin/login', {
+      const response = await fetch('/api/admin/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password })
@@ -46,7 +46,7 @@ export default function AdminDashboard() {
   const fetchLeads = async (token) => {
     setFetching(true);
     try {
-      const response = await fetch('http://localhost:5000/api/admin/leads', {
+      const response = await fetch('/api/admin/leads', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (response.ok) {

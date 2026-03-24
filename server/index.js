@@ -148,6 +148,15 @@ app.get('/api/admin/leads', authenticateToken, async (req, res) => {
   }
 });
 
+// --- DEPLOYMENT PREPARATION ---
+const path = require('path');
+const staticPath = path.join(__dirname, '../dist');
+app.use(express.static(staticPath));
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(staticPath, 'index.html'));
+});
+
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
