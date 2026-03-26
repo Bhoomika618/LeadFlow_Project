@@ -10,17 +10,6 @@ const Lead = require('./models/Lead');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-/*
- * INTERVIEW PREP (Q32): What is Middleware in Express?
- * Middleware functions are functions that have access to the request object (req), the response object (res), 
- * and the next middleware function in the application’s request-response cycle.
- * They can execute any code, make changes to the request and the response objects, end the request-response cycle, 
- * or call the next middleware function in the stack.
- * 
- * Example below:
- * `cors()` allows our frontend (running on a different port) to communicate with this backend.
- * `express.json()` parses incoming requests with JSON payloads and is based on body-parser.
- */
 app.use(cors());
 app.use(express.json());
 
@@ -38,25 +27,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-/*
- * INTERVIEW PREP (Q43): What are REST principles?
- * REST (Representational State Transfer) is an architectural style for designing networked applications.
- * Key principles include:
- * 1. Client-Server architecture (separating UI concerns from data storage concerns).
- * 2. Statelessness (each request from client to server must contain all information needed to understand and process it).
- * 3. Cacheability (responses must implicitly or explicitly define themselves as cacheable or not).
- * 4. Uniform Interface (using standard HTTP methods like GET, POST, PUT, DELETE logically).
- * 
- * INTERVIEW PREP (Q42): What are CRUD operations?
- * CRUD stands for Create, Read, Update, and Delete. These are the four basic functions models must be able to do.
- * In a REST context, they map to HTTP verbs:
- * - Create -> POST
- * - Read -> GET
- * - Update -> PUT / PATCH
- * - Delete -> DELETE
- * 
- * Example below: A RESTful POST endpoint performing a 'Create' operation.
- */
+
 const signupLimiter = rateLimit({
   windowMs: 5 * 60 * 1000, // 5 minutes
   max: 3, // Limit each IP to 3 waitlist requests per window
