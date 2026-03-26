@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Shield, Lock, Users, LogOut, Loader2 } from 'lucide-react';
+import { Shield, Lock, Users, LogOut, Loader2, Trash2 } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
 
 export default function AdminDashboard() {
@@ -70,6 +70,30 @@ export default function AdminDashboard() {
     toast.success('Logged out securely');
   };
 
+  const handleDeleteLead = async (leadId) => {
+    if (!window.confirm('Are you sure you want to delete this lead? This action cannot be undone.')) {
+      return;
+    }
+
+    const token = localStorage.getItem('adminToken');
+    try {
+      const response = await fetch(`/api/admin/deleteLead?id=${leadId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (response.ok) {
+        setLeads(leads.filter(lead => (lead._id || lead.id) !== leadId));
+        toast.success('Lead deleted successfully');
+      } else {
+        const data = await response.json();
+        toast.error(data.error || 'Failed to delete lead');
+      }
+    } catch (err) {
+      toast.error('Connection failed');
+    }
+  };
+
   if (!isLoggedIn) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-950 px-4">
@@ -137,7 +161,7 @@ export default function AdminDashboard() {
                   <tr className="bg-slate-950/50 border-b border-slate-800 text-sm uppercase tracking-wider text-slate-400">
                     <th className="p-4 font-semibold">Name</th>
                     <th className="p-4 font-semibold">Email</th>
-                    <th className="p-4 font-semibold">Joined Date</th>
+                    <th className="p-4 font-semibold text-center">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -150,6 +174,15 @@ export default function AdminDashboard() {
                       <td className="p-4 font-medium text-white">{lead.name}</td>
                       <td className="p-4 text-slate-400">{lead.email}</td>
                       <td className="p-4 text-slate-500">{new Date(lead.createdAt || Date.now()).toLocaleDateString()} at {new Date(lead.createdAt || Date.now()).toLocaleTimeString()}</td>
+                      <td className="p-4 text-center">
+                        <button 
+                          onClick={() => handleDeleteLead(lead._id || lead.id)}
+                          className="p-2 text-slate-500 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all"
+                          title="Delete Lead"
+                        >
+                          <Trash2 className="w-5 h-5" />
+                        </button>
+                      </td>
                     </motion.tr>
                   ))}
                   {leads.length === 0 && (
