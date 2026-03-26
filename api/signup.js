@@ -1,31 +1,25 @@
 // Vercel Serverless Function: POST /api/signup
-// This replaces the Express route that was in server/index.js
-
-const mongoose = require('mongoose');
-const nodemailer = require('nodemailer');
+import mongoose from 'mongoose';
+import nodemailer from 'nodemailer';
 
 // --- Mongoose Setup ---
-// Cache the connection to avoid reconnecting on every invocation
 let isConnected = false;
 
 async function connectDB() {
   if (isConnected) return;
-  
   await mongoose.connect(process.env.MONGODB_URI);
   isConnected = true;
-  console.log('Connected to MongoDB');
 }
 
-// Define the Lead schema inline (since we can't easily import from server/models in serverless)
+// Define the Lead schema
 const leadSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
 }, { timestamps: true });
 
-// Use existing model if already compiled, otherwise create it
 const Lead = mongoose.models.Lead || mongoose.model('Lead', leadSchema);
 
-// Configure Nodemailer Transport
+// Configure Nodemailer
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -34,12 +28,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-module.exports = async function handler(req, res) {
-  // Only allow POST requests
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
-
+export default async function handler(req, res) {
   // CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -47,6 +36,10 @@ module.exports = async function handler(req, res) {
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
+  }
+
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
   }
 
   const { name, email } = req.body;
@@ -79,12 +72,8 @@ module.exports = async function handler(req, res) {
       `,
     };
 
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.error('Error sending email:', error);
-      } else {
-        console.log('Verification email sent:', info.response);
-      }
+    transporter.sendMail(mailOptions).catch((err) => {
+      console.error('Error sending email:', err);
     });
 
     res.status(201).json({ message: 'Successfully joined the waitlist!', lead: newLead });
@@ -92,4 +81,4 @@ module.exports = async function handler(req, res) {
     console.error('Signup error:', error);
     res.status(500).json({ error: 'An internal server error occurred.' });
   }
-};
+}

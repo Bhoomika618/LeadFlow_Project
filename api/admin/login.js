@@ -1,7 +1,7 @@
 // Vercel Serverless Function: POST /api/admin/login
-const jwt = require('jsonwebtoken');
+import jwt from 'jsonwebtoken';
 
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   // CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -23,4 +23,4 @@ module.exports = async function handler(req, res) {
   } else {
     res.status(401).json({ error: 'Invalid password' });
   }
-};
+}
