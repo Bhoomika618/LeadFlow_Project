@@ -79,6 +79,6 @@ export default async function handler(req, res) {
     res.status(201).json({ message: 'Successfully joined the waitlist!', lead: newLead });
   } catch (error) {
     console.error('Signup error:', error);
-    res.status(500).json({ error: error.message || 'An internal server error occurred.' });
+    res.status(500).json({ error: 'An internal server error occurred.' });
   }
 }
